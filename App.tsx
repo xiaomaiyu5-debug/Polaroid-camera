@@ -173,7 +173,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col relative select-none">
+    <div className="min-h-screen w-full flex flex-col relative select-none justify-between">
       
       {/* Header / Top Bar */}
       <div className="w-full p-4 flex flex-col sm:flex-row justify-between items-center z-40 relative pointer-events-none gap-4 sm:gap-2">
