@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>InstaCam GenAI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Gochi Hand', cursive;
+        background-color: #e5e5f7;
+        background-image: radial-gradient(#cbd5e1 2px, transparent 2px);
+        background-size: 24px 24px;
+        overflow: hidden; /* Prevent scrolling during animations */
+      }
+      .font-hand {
+        font-family: 'Gochi Hand', cursive;
+      }
+      /* Custom scrollbar for the gallery if needed */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+      }
+      
+      /* Print Animation Keyframes */
+      @keyframes eject-photo {
+        0% {
+          top: 0;
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        20% {
+          opacity: 1;
+        }
+        100% {
+          top: 110%; /* Slide out fully */
+          transform: scale(1);
+        }
+      }
+
+      @keyframes develop-film {
+        0% { filter: brightness(0) grayscale(1); }
+        50% { filter: brightness(0.5) grayscale(0.5); }
+        100% { filter: brightness(1) grayscale(0); }
+      }
+
+      .animate-eject {
+        animation: eject-photo 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      }
+      
+      .animate-develop {
+        animation: develop-film 3s ease-in-out forwards;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "uuid": "https://aistudiocdn.com/uuid@^13.0.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

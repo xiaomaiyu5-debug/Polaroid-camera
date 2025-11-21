@@ -1,0 +1,7 @@
+{
+  "name": "InstaCam GenAI",
+  "description": "A retro instant camera experience that prints Polaroids with AI-generated captions.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
