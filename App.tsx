@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Camera } from './components/Camera';
 import { PhotoCard } from './components/PhotoCard';
 import { Photo } from './types';
@@ -14,6 +14,7 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [printingPhoto, setPrintingPhoto] = useState<string | null>(null); // Stores dataUrl for animation
   const [view, setView] = useState<'camera' | 'gallery'>('camera');
+  const [zoomedPhoto, setZoomedPhoto] = useState<Photo | null>(null);
   
   // Drag and Drop State
   const [dragState, setDragState] = useState<{
@@ -22,16 +23,28 @@ export default function App() {
     startY: number;
     initialPhotoX: number;
     initialPhotoY: number;
+    isClick: boolean;
   } | null>(null);
   const [maxZIndex, setMaxZIndex] = useState(10);
 
+  const deskHeight = useMemo(() => {
+    if (photos.length === 0) return '50vh';
+    const maxY = photos.reduce((max, p) => Math.max(max, p.y), 0);
+    return `${maxY + 350}px`;
+  }, [photos]);
+
   // Global drag event listeners
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMove = (clientX: number, clientY: number) => {
       if (!dragState) return;
       
-      const dx = e.clientX - dragState.startX;
-      const dy = e.clientY - dragState.startY;
+      const dx = clientX - dragState.startX;
+      const dy = clientY - dragState.startY;
+
+      // Check if it's a drag or a click
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+        setDragState(prev => prev ? { ...prev, isClick: false } : null);
+      }
 
       setPhotos(prev => prev.map(p => {
         if (p.id === dragState.id) {
@@ -45,20 +58,31 @@ export default function App() {
       }));
     };
 
-    const handleMouseUp = () => {
+    const handleUp = () => {
+      if (dragState?.isClick) {
+        const photo = photos.find(p => p.id === dragState.id);
+        if (photo) setZoomedPhoto(photo);
+      }
       setDragState(null);
     };
 
+    const handleMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY);
+    const handleTouchMove = (e: TouchEvent) => handleMove(e.touches[0].clientX, e.touches[0].clientY);
+
     if (dragState) {
       window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('mouseup', handleUp);
+      window.addEventListener('touchmove', handleTouchMove);
+      window.addEventListener('touchend', handleUp);
     }
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mouseup', handleUp);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleUp);
     };
-  }, [dragState]);
+  }, [dragState, photos]);
 
   const handleCapture = async (dataUrl: string) => {
     if (isProcessing) return;
@@ -120,20 +144,28 @@ export default function App() {
     }
   };
 
-  const handlePhotoMouseDown = (e: React.MouseEvent, photo: Photo) => {
-    // Bring to front
+  const handlePhotoInteractionStart = (id: string, startX: number, startY: number, photoX: number, photoY: number) => {
     const newZ = maxZIndex + 1;
     setMaxZIndex(newZ);
     
-    setPhotos(prev => prev.map(p => p.id === photo.id ? { ...p, zIndex: newZ } : p));
+    setPhotos(prev => prev.map(p => p.id === id ? { ...p, zIndex: newZ } : p));
 
     setDragState({
-        id: photo.id,
-        startX: e.clientX,
-        startY: e.clientY,
-        initialPhotoX: photo.x,
-        initialPhotoY: photo.y
+        id: id,
+        startX: startX,
+        startY: startY,
+        initialPhotoX: photoX,
+        initialPhotoY: photoY,
+        isClick: true, // Assume it's a click until proven otherwise by movement
     });
+  };
+
+  const handlePhotoMouseDown = (e: React.MouseEvent, photo: Photo) => {
+    handlePhotoInteractionStart(photo.id, e.clientX, e.clientY, photo.x, photo.y);
+  };
+
+  const handlePhotoTouchStart = (e: React.TouchEvent, photo: Photo) => {
+    handlePhotoInteractionStart(photo.id, e.touches[0].clientX, e.touches[0].clientY, photo.x, photo.y);
   };
 
   if (view === 'gallery') {
@@ -144,7 +176,7 @@ export default function App() {
     <div className="min-h-screen w-full flex flex-col relative select-none">
       
       {/* Header / Top Bar */}
-      <div className="w-full p-4 flex justify-between items-center z-40 relative pointer-events-none">
+      <div className="w-full p-4 flex flex-col sm:flex-row justify-between items-center z-40 relative pointer-events-none gap-4 sm:gap-2">
         <div className="pointer-events-auto bg-white/80 backdrop-blur border-2 border-pink-400 rounded-full px-6 py-2 shadow-[4px_4px_0px_rgba(244,114,182,1)] transform hover:-translate-y-1 transition-transform cursor-pointer">
             <span className="font-hand font-bold text-pink-500 text-lg tracking-wide">
                 INSTACAM AI ✨
@@ -154,15 +186,17 @@ export default function App() {
         <div className="flex gap-4 pointer-events-auto">
             <button 
                 onClick={handleDownloadAll}
-                className="bg-white border-2 border-black rounded-full px-4 py-2 font-hand font-bold hover:bg-gray-50 active:translate-y-1 transition-all flex items-center gap-2"
+                className="bg-white border-2 border-black rounded-full p-2 sm:px-4 sm:py-2 font-hand font-bold hover:bg-gray-50 active:translate-y-1 transition-all flex items-center gap-2"
             >
-                <Download size={18} /> DOWNLOAD LATEST
+                <Download size={18} />
+                <span className="hidden sm:inline">DOWNLOAD LATEST</span>
             </button>
             <button 
                 onClick={() => setPhotos([])}
-                className="bg-white border-2 border-red-400 text-red-500 rounded-full px-4 py-2 font-hand font-bold hover:bg-red-50 active:translate-y-1 transition-all flex items-center gap-2"
+                className="bg-white border-2 border-red-400 text-red-500 rounded-full p-2 sm:px-4 sm:py-2 font-hand font-bold hover:bg-gray-50 active:translate-y-1 transition-all flex items-center gap-2"
             >
-                <RefreshCw size={18} /> RESET
+                <RefreshCw size={18} />
+                <span className="hidden sm:inline">RESET</span>
             </button>
         </div>
       </div>
@@ -192,7 +226,7 @@ export default function App() {
         </div>
 
         {/* Right Side: Gallery / Desk */}
-        <div className="relative flex-1 h-[300px] sm:h-[400px] lg:h-full w-full flex items-start justify-start p-4 sm:p-10 perspective-[1000px]">
+        <div className="relative flex-1 w-full flex items-start justify-start p-4 sm:p-10 perspective-[1000px]">
              
             {/* Empty State */}
             {photos.length === 0 && !printingPhoto && (
@@ -211,7 +245,7 @@ export default function App() {
             )}
 
             {/* Photo Stack Grid */}
-            <div className="relative w-full h-full">
+            <div className="relative w-full" style={{ height: deskHeight }}>
                 {photos.map((photo) => (
                     <div 
                         key={photo.id}
@@ -228,6 +262,8 @@ export default function App() {
                             onUpdateCaption={updateCaption}
                             onDelete={deletePhoto}
                             onMouseDown={(e) => handlePhotoMouseDown(e, photo)}
+                            onTouchStart={(e) => handlePhotoTouchStart(e, photo)}
+                            onClick={() => {}} // We handle click in the 'up' event of drag
                         />
                     </div>
                 ))}
@@ -235,6 +271,26 @@ export default function App() {
         </div>
 
       </div>
+
+      {/* Zoomed Photo Modal */}
+      {zoomedPhoto && (
+        <div 
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+          onClick={() => setZoomedPhoto(null)}
+        >
+          <div className="relative max-w-3xl max-h-[90vh] p-4">
+            <img 
+              src={zoomedPhoto.dataUrl} 
+              alt="Zoomed Memory" 
+              className="max-w-full max-h-full object-contain"
+            />
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-white/90 p-4 rounded-lg shadow-2xl w-11/12 text-center">
+                <p className="font-hand text-2xl text-gray-800">{zoomedPhoto.caption}</p>
+                <p className="text-xs text-gray-500 mt-1">{new Date(zoomedPhoto.timestamp).toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="w-full p-4 sm:p-6 flex flex-col sm:flex-row justify-center sm:justify-between items-center sm:items-end z-50 pointer-events-none gap-4">
          <div onClick={() => setView('gallery')} className="pointer-events-auto bg-[#6b4c3e] text-[#f0eadd] px-6 py-3 rounded-lg sm:rounded-tr-2xl sm:rounded-bl-2xl shadow-lg border-b-4 border-[#4a3228] hover:translate-y-1 hover:border-b-0 transition-all cursor-pointer order-2 sm:order-1">

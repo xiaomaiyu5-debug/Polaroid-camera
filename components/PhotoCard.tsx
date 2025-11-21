@@ -7,11 +7,13 @@ interface PhotoCardProps {
   onUpdateCaption: (id: string, newCaption: string) => void;
   onDelete: (id: string) => void;
   onMouseDown: (e: React.MouseEvent) => void;
+  onTouchStart: (e: React.TouchEvent) => void;
+  onClick: (e: React.MouseEvent) => void;
   className?: string;
   style?: React.CSSProperties;
 }
 
-export const PhotoCard: React.FC<PhotoCardProps> = ({ photo, onUpdateCaption, onDelete, onMouseDown, className, style }) => {
+export const PhotoCard: React.FC<PhotoCardProps> = ({ photo, onUpdateCaption, onDelete, onMouseDown, onTouchStart, onClick, className, style }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [localCaption, setLocalCaption] = useState(photo.caption);
 
@@ -29,6 +31,8 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({ photo, onUpdateCaption, on
   return (
     <div 
       onMouseDown={onMouseDown}
+      onTouchStart={onTouchStart}
+      onClick={onClick}
       className={`relative group bg-white p-3 pb-8 shadow-xl cursor-grab active:cursor-grabbing ${className}`}
       style={{
         width: '240px',
