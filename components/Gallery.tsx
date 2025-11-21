@@ -14,22 +14,22 @@ export const Gallery: React.FC<GalleryProps> = ({ photos, setView }) => {
           onClick={() => setView('camera')}
           className="bg-white/80 backdrop-blur border-2 border-gray-400 rounded-full px-6 py-2 shadow-[2px_2px_0px_rgba(0,0,0,0.2)] transform hover:-translate-y-1 transition-transform cursor-pointer"
         >
-          <span className="font-hand font-bold text-gray-600 text-lg tracking-wide">
+          <span className="font-hand font-bold text-gray-600 text-base sm:text-lg tracking-wide">
             ← BACK TO CAMERA
           </span>
         </button>
       </div>
 
-      <div className="flex flex-col items-center justify-start pt-10">
-        <h1 className="font-hand font-bold text-5xl text-white" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
+      <div className="flex flex-col items-center justify-start pt-6 sm:pt-10">
+        <h1 className="font-hand font-bold text-3xl sm:text-4xl md:text-5xl text-white text-center px-4" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
           PUBLIC PINBOARD GALLERY
         </h1>
-        <h2 className="font-hand text-xl text-white/80 mt-2">
+        <h2 className="font-hand text-lg sm:text-xl text-white/80 mt-2 text-center px-4">
           SHARED MEMORIES FROM THE RETRO CAMERA COMMUNITY
         </h2>
 
-        <div className="w-full max-w-6xl mx-auto mt-10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div className="w-full max-w-6xl mx-auto mt-6 sm:mt-10 px-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-8">
             {photos.map(photo => (
               <div key={photo.id} className="relative bg-white p-3 pb-8 shadow-lg border border-gray-200 transform -rotate-3">
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-red-500 rounded-full shadow-md"></div>

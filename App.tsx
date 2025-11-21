@@ -167,7 +167,7 @@ export default function App() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col lg:flex-row items-center justify-center w-full max-w-7xl mx-auto p-4 gap-12 relative z-0">
+      <div className="flex-1 flex flex-col lg:flex-row items-center justify-center w-full max-w-7xl mx-auto p-4 gap-8 md:gap-12 relative z-0">
         
         {/* Left Side: Camera Section */}
         <div className="relative flex flex-col items-center justify-center z-30 pointer-events-auto">
@@ -192,17 +192,17 @@ export default function App() {
         </div>
 
         {/* Right Side: Gallery / Desk */}
-        <div className="relative flex-1 h-[500px] lg:h-full w-full flex items-start justify-start p-10 perspective-[1000px]">
+        <div className="relative flex-1 h-[300px] sm:h-[400px] lg:h-full w-full flex items-start justify-start p-4 sm:p-10 perspective-[1000px]">
              
             {/* Empty State */}
             {photos.length === 0 && !printingPhoto && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40 z-0">
-                    <p className="font-hand text-4xl text-gray-400 rotate-[-10deg]">
+                    <p className="font-hand text-2xl sm:text-3xl md:text-4xl text-gray-400 rotate-[-10deg] text-center">
                         Take a photo to start your collection! <br/>
-                        <span className="text-sm block mt-4 ml-10">AI will caption it for you -{'>'}</span>
+                        <span className="text-sm block mt-2 sm:mt-4 ml-4 sm:ml-10">AI will caption it for you -{'>'}</span>
                     </p>
-                    <div className="absolute right-20 top-1/2">
-                         <svg width="100" height="100" viewBox="0 0 100 100" className="stroke-gray-400 fill-none stroke-2 animate-bounce">
+                    <div className="absolute right-4 sm:right-10 md:right-20 top-1/2">
+                         <svg width="60" height="60" sm:width="80" sm:height="80" md:width="100" md:height="100" viewBox="0 0 100 100" className="stroke-gray-400 fill-none stroke-2 animate-bounce">
                              <path d="M10,50 Q30,10 50,50 T90,50" />
                              <path d="M80,40 L90,50 L80,60" />
                          </svg>
@@ -236,12 +236,12 @@ export default function App() {
 
       </div>
 
-      <div className="w-full p-6 flex justify-between items-end z-50 pointer-events-none">
-         <div onClick={() => setView('gallery')} className="pointer-events-auto bg-[#6b4c3e] text-[#f0eadd] px-6 py-3 rounded-tr-2xl rounded-bl-2xl shadow-lg border-b-4 border-[#4a3228] hover:translate-y-1 hover:border-b-0 transition-all cursor-pointer">
-            <span className="font-hand font-bold text-xl tracking-wider">View Public Pinboard Gallery</span>
+      <div className="w-full p-4 sm:p-6 flex flex-col sm:flex-row justify-center sm:justify-between items-center sm:items-end z-50 pointer-events-none gap-4">
+         <div onClick={() => setView('gallery')} className="pointer-events-auto bg-[#6b4c3e] text-[#f0eadd] px-6 py-3 rounded-lg sm:rounded-tr-2xl sm:rounded-bl-2xl shadow-lg border-b-4 border-[#4a3228] hover:translate-y-1 hover:border-b-0 transition-all cursor-pointer order-2 sm:order-1">
+            <span className="font-hand font-bold text-lg sm:text-xl tracking-wider text-center">View Public Pinboard Gallery</span>
          </div>
          
-         <div className="text-gray-400 font-hand text-sm text-right">
+         <div className="text-gray-400 font-hand text-sm text-center sm:text-right order-1 sm:order-2">
             <p>Use once to capture your day through everyone's eyes.</p>
             <p className="text-xs mt-1 opacity-70">Powered by Google Gemini 2.5 Flash</p>
          </div>
